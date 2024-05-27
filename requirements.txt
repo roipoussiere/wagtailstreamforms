@@ -5,5 +5,4 @@ Django>=5
 mock
 
 # example site
-django-recaptcha
 wagtail_modeladmin
