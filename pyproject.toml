@@ -1,3 +1,52 @@
+[tool.poetry]
+package-mode = true
+name = "wagtailstreamforms"
+version = "4.1.0"
+description = "Wagtail forms in a streamfield"
+authors = ["Stuart George <stuart@accentdesign.co.uk>"]
+license = "MIT"
+readme = "README.rst"
+homepage = "https://pypi.python.org/pypi/wagtailstreamforms"
+repository = "https://github.com/AccentDesign/wagtailstreamforms/"
+documentation = "https://wagtailstreamforms.readthedocs.io/en/latest/"
+keywords = ["wagtail", "streamfield", "forms", "accent", "design"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: Django",
+    "Framework :: Django :: 5.0",
+    "Framework :: Wagtail",
+    "Framework :: Wagtail :: 5",
+    "Framework :: Wagtail :: 6",
+    "Topic :: Internet :: WWW/HTTP :: Site Management",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^5.0.4"
+wagtail = "^6.0.2"
+wagtail-modeladmin = "^2.0.0"
+wagtail-generic-chooser = "^0.6.1"
+unidecode = "^1.3.8"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+pytest-django = "^4.8.0"
+mock = "^5.1.0"
+ruff = "^0.4.5"
+
+[tool.poetry.group.doc.dependencies]
+sphinxcontrib-spelling = "^8.0.0"
+sphinx = "^7.3.7"
+sphinx-autobuild = "^2024.4.16"
+karma-sphinx-theme = "^0.0.8"
+
 [tool.black]
 line-length=99
 target-version=["py310"]
@@ -10,3 +59,7 @@ exclude = '''
   | migrations
 )/
 '''
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

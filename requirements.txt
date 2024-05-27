@@ -1,8 +1,0 @@
-# The app itself
--e .
-
-Django>=5
-mock
-
-# example site
-wagtail_modeladmin
