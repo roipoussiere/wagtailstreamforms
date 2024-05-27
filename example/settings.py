@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
     # wagtail
     'wagtail',
     'wagtail.admin',
@@ -40,10 +39,8 @@ INSTALLED_APPS = [
     'wagtail_modeladmin',
     'wagtail.contrib.settings',
     'wagtail.contrib.search_promotions',
-
     'django_recaptcha',
     'taggit',
-
     # app specific
     'wagtailstreamforms',
     'example',
@@ -88,12 +85,8 @@ WSGI_APPLICATION = 'example.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': environ.get('DB_HOSTNAME'),
-        'PORT': environ.get('DB_PORT'),
-        'NAME': environ.get('DB_NAME'),
-        'USER': environ.get('DB_USERNAME'),
-        'PASSWORD': environ.get('DB_PASSWORD'),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": SITE_DIR + "/default.db.sqlite3",
     }
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
