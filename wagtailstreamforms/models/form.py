@@ -3,7 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from wagtail import VERSION as WAGTAIL_VERSION
+# from wagtail import VERSION as WAGTAIL_VERSION
 from wagtail.admin.panels import (
     FieldPanel,
     MultiFieldPanel,
@@ -35,13 +35,16 @@ class AbstractForm(models.Model):
     title = models.CharField(_("Title"), max_length=255)
     slug = models.SlugField(
         _("Slug"),
-        allow_unicode=True,
+        # allow_unicode=True,
         max_length=255,
         unique=True,
         help_text=_("Used to identify the form in template tags"),
     )
     template_name = models.CharField(
-        _("Template"), max_length=255, choices=get_setting("FORM_TEMPLATES")
+        _("Template"),
+        max_length=255,
+        choices=get_setting("FORM_TEMPLATES"),
+        default=get_setting("FORM_TEMPLATES")[0][1]
     )
     fields = FormFieldsStreamField([], verbose_name=_("Fields"))
     submit_button_text = models.CharField(
@@ -95,8 +98,8 @@ class AbstractForm(models.Model):
         ]
     )
 
-    def __str__(self):
-        return self.title
+    def __str__(self) -> str:
+        return str(self.title)
 
     class Meta:
         abstract = True
@@ -163,10 +166,7 @@ class AbstractForm(models.Model):
     def get_form_fields(self):
         """Returns the form field's stream data."""
 
-        if WAGTAIL_VERSION >= (2, 12):
-            form_fields = self.fields.raw_data
-        else:
-            form_fields = self.fields.stream_data
+        form_fields = self.fields._raw_data
         for fn in hooks.get_hooks("construct_submission_form_fields"):
             form_fields = fn(form_fields)
         return form_fields
@@ -183,6 +183,10 @@ class AbstractForm(models.Model):
             if fn.__name__ in self.process_form_submission_hooks:
                 fn(self, form)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        for post_save_form_hook in hooks.get_hooks("post_save_form"):
+            post_save_form_hook(self)
 
 class Form(AbstractForm):
     pass

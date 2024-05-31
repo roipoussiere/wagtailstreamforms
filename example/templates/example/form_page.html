@@ -12,9 +12,10 @@
 <body>
     <header>
         <div class="container">
-            <h1>Wagtail Streamforms</h1>
+            <h1>Formulaires</h1>
         </div>
     </header>
+
     <div class="container">
         {% if messages %}
         <ul class="messages">
@@ -26,13 +27,10 @@
         {% for block in page.body %}
             {% include_block block %}
         {% endfor %}
-        <footer>
-            <ul class="links muted">
-                <li>Wagtail Streamforms on <a href="https://github.com/labd/wagtailstreamforms">Github</a></li>
-                <li>Styled with <a href="http://karmacss.com">KarmaCSS</a></li>
-            </ul>
-        </footer>
     </div>
-    {% wagtailuserbar %}
+
+    <footer>
+        {% wagtailuserbar %}
+    </footer>    
 </body>
 </html>

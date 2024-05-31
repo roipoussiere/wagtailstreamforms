@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'wagtail.sites',
     'wagtail_modeladmin', # TODO: migrate to wagtail's Snippets
                           # https://docs.wagtail.org/en/v5.2.3/reference/contrib/modeladmin/migrating_to_snippets.html
-    'wagtail.contrib.settings',
-    'wagtail.contrib.search_promotions',
+    # 'wagtail.contrib.settings',
+    # 'wagtail.contrib.search_promotions',
 
     # Misc.
     'taggit',
@@ -96,7 +96,7 @@ DATABASES = {
         "NAME": SITE_DIR + "/default.db.sqlite3",
     }
 }
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email
 
@@ -146,4 +146,11 @@ WAGTAILADMIN_BASE_URL = "/"
 
 # Forms
 
+WAGTAILSTREAMFORMS_ADMIN_MENU_LABEL = 'Formulaires'
+
 WAGTAILSTREAMFORMS_ADVANCED_SETTINGS_MODEL = 'example.AdvancedFormSetting'
+
+WAGTAILSTREAMFORMS_FORM_TEMPLATES = (
+    ('streamforms/form_block.html', 'Simple'),
+    # ('app/custom_form_template.html', 'Custom Form Template'),
+)

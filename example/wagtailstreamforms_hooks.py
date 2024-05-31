@@ -4,11 +4,12 @@ from django.template.defaultfilters import pluralize
 
 from wagtailstreamforms.hooks import register
 
+from .models import FormPage
+
 
 @register('process_form_submission')
 def email_submission(instance, form):
     """ Send an email with the submission. """
-
     if not hasattr(instance, 'advanced_settings'):
         return
 
@@ -43,3 +44,8 @@ def email_submission(instance, form):
 
     # finally send the email
     email.send(fail_silently=True)
+
+
+@register('post_save_form')
+def post_save_form(form):
+    FormPage.create(form)

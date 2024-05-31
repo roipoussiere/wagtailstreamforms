@@ -10,6 +10,8 @@ from wagtail import hooks
 from wagtail.admin import messages as wagtail_messages
 from wagtail_modeladmin.helpers import AdminURLHelper, ButtonHelper
 from wagtail_modeladmin.options import ModelAdmin, modeladmin_register
+# from wagtail.snippets.models import register_snippet
+# from wagtail.snippets.views.snippets import SnippetViewSet
 from wagtail_modeladmin.views import CreateView, DeleteView, EditView, InspectView
 
 from wagtailstreamforms import hooks as form_hooks
@@ -123,14 +125,17 @@ class EditFormView(InstanceSpecificViewHookMixin, EditView):
 class DeleteFormView(InstanceSpecificViewHookMixin, DeleteView):
     pass
 
-
 @modeladmin_register
+# @register_snippet
+# class FormSnippetViewSet(SnippetViewSet):
 class FormModelAdmin(ModelAdmin):
     model = Form
+    # add_to_admin_menu = True
     list_display = ("title", "slug", "latest_submission", "saved_submissions")
     list_filter = None
     menu_label = _(get_setting("ADMIN_MENU_LABEL"))
     menu_order = get_setting("ADMIN_MENU_ORDER")
+    # icon = "form"
     menu_icon = "form"
     search_fields = ("title", "slug")
     button_helper_class = FormButtonHelper
@@ -217,9 +222,14 @@ def process_form(page, request, *args, **kwargs):
                     }
                 )
 
-                # create error message
+                # create error messages
                 if form_def.error_message:
                     messages.error(request, form_def.error_message, fail_silently=True)
+                else:
+                    for field_name, field_errors in form._errors.items():
+                        for field_error in field_errors:
+                            error_message = f"{ field_name }: { field_error }"
+                            messages.error(request, error_message, fail_silently=True)
 
                 return TemplateResponse(
                     request, page.get_template(request, *args, **kwargs), context

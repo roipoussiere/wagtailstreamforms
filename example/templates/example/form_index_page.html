@@ -1,0 +1,29 @@
+{% load i18n static wagtailcore_tags %}
+<!DOCTYPE html>
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <title>{{ page.title }}</title>
+
+</head>
+<body>
+
+    <header>
+        <h1>{{ page.title }}</h1>
+    </header>
+
+    <div class="container">
+        {% if form_pages %}
+        <ul class="form-pages">
+            {% for form_page in form_pages %}
+                <li><a href="{{ form_page.url }}">{{ form_page.title }}</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>Pas de formulaire.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>
