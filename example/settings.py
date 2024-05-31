@@ -12,12 +12,13 @@ SECRET_KEY = environ.get('SECRET_KEY', 's3cr3t')
 
 DEBUG = True
 
-ALLOWED_HOSTS = [] + environ.get('ALLOWED_HOSTS', '').split(',')
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] + environ.get('ALLOWED_HOSTS', '').split(',')
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    # Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.sitemaps',
@@ -25,7 +26,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # wagtail
+
+    # Wagtail
     'wagtail',
     'wagtail.admin',
     'wagtail.documents',
@@ -36,12 +38,18 @@ INSTALLED_APPS = [
     'wagtail.search',
     'wagtail.contrib.redirects',
     'wagtail.sites',
-    'wagtail_modeladmin',
+    'wagtail_modeladmin', # TODO: migrate to wagtail's Snippets
+                          # https://docs.wagtail.org/en/v5.2.3/reference/contrib/modeladmin/migrating_to_snippets.html
     'wagtail.contrib.settings',
     'wagtail.contrib.search_promotions',
-    'django_recaptcha',
+
+    # Misc.
     'taggit',
-    # app specific
+    'generic_chooser', # TODO: migrate to wagtail's ChooserViewSet
+                       # https://docs.wagtail.org/en/stable/extending/generic_views.html#chooserviewset
+
+    # Example project
+    'django_recaptcha',
     'wagtailstreamforms',
     'example',
 ]
