@@ -1,8 +1,9 @@
 import uuid
 from typing_extensions import Self
 
+from slugify import slugify
+
 from django.db import models
-from django.utils.text import slugify
 
 from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
@@ -40,7 +41,7 @@ class FormPage(Page):
     @classmethod
     def create(cls, form: Form) -> Self:
         form_index_page = FormIndexPage.get_or_create()
-        form_page = FormPage(title=form.title)
+        form_page = FormPage(slug=form.slug, title=form.title)
 
         form_data = {
             'form': form.pk,
