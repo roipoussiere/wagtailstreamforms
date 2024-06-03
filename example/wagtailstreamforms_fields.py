@@ -1,58 +1,35 @@
 from django import forms
-from django.contrib.auth.models import User
 
-from wagtail import blocks
+from wagtail.blocks import RichTextBlock, StructBlock
 from wagtailstreamforms.fields import BaseField, register
 
 
-@register('regex_validated')
-class RegexValidatedField(BaseField):
-    field_class = forms.RegexField
-    label = 'Regex field'
+class RichTextWidget(forms.widgets.Input):
+    input_type = "hidden"
+    template_name = "example/rich_text_widget.html"
+    rich_text = ""
+
+    def get_context(self, *args):
+        return {
+            **super().get_context(*args),
+            "rich_text": self.rich_text,
+        }
+
+
+@register('information_text')
+class RichTextField(BaseField):
+    field_class = forms.CharField
+    widget = RichTextWidget
+    icon = "title"
+    label = "Information text"
 
     def get_options(self, block_value):
-        options = super().get_options(block_value)
-        options.update({
-            'regex': block_value.get('regex'),
-            'error_messages': {'invalid': block_value.get('error_message')}
-        })
-        return options
+        self.widget.rich_text = block_value["label"]
+        return super().get_options(block_value)
 
-    def get_regex_choices(self):
-        return (
-            ('(.*?)', 'Any'),
-            ('^[a-zA-Z0-9]+$', 'Letters and numbers only'),
+    def get_form_block(self):
+        return StructBlock(
+            [("label", RichTextBlock())],
+            icon=self.icon,
+            label=self.label,
         )
-
-    def get_form_block(self):
-        return blocks.StructBlock([
-            ('label', blocks.CharBlock()),
-            ('help_text', blocks.CharBlock(required=False)),
-            ('required', blocks.BooleanBlock(required=False)),
-            ('regex', blocks.ChoiceBlock(choices=self.get_regex_choices())),
-            ('error_message', blocks.CharBlock()),
-            ('default_value', blocks.CharBlock(required=False)),
-        ], icon=self.icon, label=self.label)
-
-
-@register('user')
-class UserChoiceField(BaseField):
-    field_class = forms.ModelChoiceField
-    icon = 'user'
-    label = 'User dropdown field'
-
-    @staticmethod
-    def get_queryset():
-        return User.objects.all()
-
-    def get_options(self, block_value):
-        options = super().get_options(block_value)
-        options.update({'queryset': self.get_queryset()})
-        return options
-
-    def get_form_block(self):
-        return blocks.StructBlock([
-            ('label', blocks.CharBlock()),
-            ('help_text', blocks.CharBlock(required=False)),
-            ('required', blocks.BooleanBlock(required=False)),
-        ], icon=self.icon, label=self.label)
