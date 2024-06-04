@@ -49,3 +49,8 @@ def email_submission(instance, form):
 @register('post_save_form')
 def post_save_form(form):
     FormPage.create_or_update(form)
+
+
+@register('pre_delete_form')
+def pre_delete_form(form):
+    FormPage.objects.get(form__pk=form.pk).delete()

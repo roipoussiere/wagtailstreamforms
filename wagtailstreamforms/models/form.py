@@ -188,5 +188,11 @@ class AbstractForm(models.Model):
         for post_save_form_hook in hooks.get_hooks("post_save_form"):
             post_save_form_hook(self)
 
+    def delete(self, *args, **kwargs):
+        for pre_delete_form_hook in hooks.get_hooks("pre_delete_form"):
+            pre_delete_form_hook(self)
+        super().delete(*args, **kwargs)
+
+
 class Form(AbstractForm):
     pass

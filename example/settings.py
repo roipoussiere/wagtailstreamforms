@@ -148,8 +148,6 @@ WAGTAILADMIN_BASE_URL = "/"
 
 WAGTAILSTREAMFORMS_ADMIN_MENU_LABEL = 'Formulaires'
 
-WAGTAILSTREAMFORMS_ADVANCED_SETTINGS_MODEL = 'example.AdvancedFormSetting'
-
 WAGTAILSTREAMFORMS_FORM_TEMPLATES = (
     ('streamforms/form_block.html', 'Simple'),
     # ('app/custom_form_template.html', 'Custom Form Template'),

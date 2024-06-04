@@ -1,37 +1,18 @@
-import uuid
 from typing_extensions import Self
-
-from slugify import slugify
 
 from django.db import models
 
-from wagtail.admin.panels import FieldPanel
-from wagtail.fields import StreamField
 from wagtail.models import Page
-from wagtail.blocks.stream_block import StreamValue
 
-from wagtailstreamforms.blocks import WagtailFormBlock
-from wagtailstreamforms.models.abstract import AbstractFormSetting
-from wagtailstreamforms.models import Form
+from slugify import slugify
+from wagtailstreamforms.models.form import Form
 
 
 FORM_INDEX_PAGE_TITLE = "Forms"
 
 
-class AdvancedFormSetting(AbstractFormSetting):
-    to_address = models.EmailField()
-
-
 class FormPage(Page):
-    form = models.ForeignKey(
-        Form,
-        on_delete=models.CASCADE,
-        related_name="+",
-    )
-
-    content_panels = Page.content_panels + [
-        FieldPanel('form'),
-    ]
+    form = models.ForeignKey(Form, on_delete=models.PROTECT)
 
     parent_page_types = ['example.FormIndexPage']
     subpage_types = []
@@ -59,8 +40,6 @@ class FormPage(Page):
 
 
 class FormIndexPage(Page):
-    show_in_menus_default = True
-
     parent_page_types = []
     subpage_types = ['example.FormPage']
 
