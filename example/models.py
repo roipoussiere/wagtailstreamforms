@@ -28,9 +28,6 @@ class FormPage(Page):
         on_delete=models.CASCADE,
         related_name="+",
     )
-    body = StreamField([
-        ('form', WagtailFormBlock())
-    ])
 
     content_panels = Page.content_panels + [
         FieldPanel('form'),
@@ -51,19 +48,14 @@ class FormPage(Page):
         form_index_page = FormIndexPage.get_or_create()
         form_page = FormPage(slug=form.slug, title=form.title, form=form)
 
-        form_data = {
-            'form': form.pk,
-            'form_action': form_index_page.url,
-            'form_reference': uuid.uuid4(),
-        }
-        form_page.body = StreamValue(
-            stream_block=form_page.body.stream_block,
-            stream_data=[{'type': 'form', 'value': form_data}],
-            is_lazy=True,
-        )
-
         form_index_page.add_child(instance=form_page)
         return form_page
+
+    def get_context(self, request, *args, **kwargs):
+        return {
+            **super().get_context(request, *args, **kwargs),
+            "form_block": self.form.get_form(),
+        }
 
 
 class FormIndexPage(Page):

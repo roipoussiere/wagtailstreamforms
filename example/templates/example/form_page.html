@@ -12,7 +12,7 @@
 <body>
     <header>
         <div class="container">
-            <h1>Formulaires</h1>
+            <h1>{{ page.title }}</h1>
         </div>
     </header>
 
@@ -24,9 +24,7 @@
             {% endfor %}
         </ul>
         {% endif %}
-        {% for block in page.body %}
-            {% include_block block %}
-        {% endfor %}
+        {% include_block form_block %}
     </div>
 
     <footer>
