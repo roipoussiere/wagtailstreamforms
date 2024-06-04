@@ -48,4 +48,4 @@ def email_submission(instance, form):
 
 @register('post_save_form')
 def post_save_form(form):
-    FormPage.create(form)
+    FormPage.create_or_update(form)

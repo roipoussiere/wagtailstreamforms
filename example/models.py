@@ -9,11 +9,11 @@ from wagtail.admin.panels import FieldPanel
 from wagtail.fields import StreamField
 from wagtail.models import Page
 from wagtail.blocks.stream_block import StreamValue
-from wagtail.blocks import RichTextBlock
 
 from wagtailstreamforms.blocks import WagtailFormBlock
 from wagtailstreamforms.models.abstract import AbstractFormSetting
 from wagtailstreamforms.models import Form
+
 
 FORM_INDEX_PAGE_TITLE = "Forms"
 
@@ -23,25 +23,33 @@ class AdvancedFormSetting(AbstractFormSetting):
 
 
 class FormPage(Page):
-
+    form = models.ForeignKey(
+        Form,
+        on_delete=models.CASCADE,
+        related_name="+",
+    )
     body = StreamField([
-        ('rich_text', RichTextBlock()),
         ('form', WagtailFormBlock())
     ])
 
-    # show_in_menus_default = True
-
     content_panels = Page.content_panels + [
-        FieldPanel('body'),
+        FieldPanel('form'),
     ]
 
     parent_page_types = ['example.FormIndexPage']
     subpage_types = []
 
     @classmethod
-    def create(cls, form: Form) -> Self:
+    def create_or_update(cls, form: Form) -> Self:
+        if FormPage.objects.filter(form__pk=form.pk).exists():
+            form_page = FormPage.objects.get(form__pk=form.pk)
+            form_page.title = form.title
+            form_page.slug = form.slug
+            form_page.save()
+            return form_page
+
         form_index_page = FormIndexPage.get_or_create()
-        form_page = FormPage(slug=form.slug, title=form.title)
+        form_page = FormPage(slug=form.slug, title=form.title, form=form)
 
         form_data = {
             'form': form.pk,
