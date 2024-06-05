@@ -31,9 +31,11 @@ class FormPage(Page):
         return form_page
 
     def get_context(self, request, *args, **kwargs):
+        form = self.form.get_form()
+        form.model = self.form
         return {
             **super().get_context(request, *args, **kwargs),
-            "form_block": self.form.get_form(),
+            "form": form.render("streamforms/form_block.html"),
         }
 
 
