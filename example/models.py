@@ -3,12 +3,10 @@ from typing_extensions import Self
 from django.db import models
 
 from wagtail.models import Page
+from wagtail.fields import RichTextField
+from wagtail.admin.panels import FieldPanel
 
-from slugify import slugify
 from wagtailstreamforms.models.form import Form
-
-
-FORM_INDEX_PAGE_TITLE = "Forms"
 
 
 class FormPage(Page):
@@ -40,6 +38,12 @@ class FormPage(Page):
 
 
 class FormIndexPage(Page):
+    description = RichTextField(
+        default="Liste des formulaires",
+        help_text="Descrition de la page des formulaire, visible pas le public",
+    )
+
+    content_panels = [FieldPanel("title"), FieldPanel("description")]
     parent_page_types = []
     subpage_types = ['example.FormPage']
 
@@ -56,8 +60,8 @@ class FormIndexPage(Page):
 
         home_page = Page.objects.get(slug='home')
         form_index_page = FormIndexPage(
-            title=FORM_INDEX_PAGE_TITLE,
-            slug=slugify(FORM_INDEX_PAGE_TITLE),
+            title="Formulaires",
+            slug="formulaires",
             depth=home_page.depth + 1
         )
         home_page.add_child(instance=form_index_page)

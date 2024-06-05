@@ -1,4 +1,5 @@
-{% load i18n static wagtailcore_tags %}
+{% load wagtailcore_tags %}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,15 +15,24 @@
     </header>
 
     <div class="container">
+        <div class="form-index-description">
+            {{ page.description|richtext }}
+        </div>
+
         {% if form_pages %}
-        <ul class="form-pages">
-            {% for form_page in form_pages %}
-                <li><a href="{{ form_page.url }}">{{ form_page.title }}</a></li>
-            {% endfor %}
-        </ul>
+
+            <ul class="form-pages">
+                {% for form_page in form_pages %}
+                    <li><a href="{{ form_page.url }}">{{ form_page.title }}</a></li>
+                {% endfor %}
+            </ul>
+
         {% else %}
-            <p>Pas de formulaire.</p>
+
+            <p>Aucun formulaire à afficher.</p>
+
         {% endif %}
+   
     </div>
 
 </body>

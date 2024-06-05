@@ -3,10 +3,9 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-# from wagtail import VERSION as WAGTAIL_VERSION
+
 from wagtail.admin.panels import (
     FieldPanel,
-    MultiFieldPanel,
     ObjectList,
     PageChooserPanel,
     TabbedInterface,
@@ -14,14 +13,12 @@ from wagtail.admin.panels import (
 from wagtail.models import Site
 
 from wagtailstreamforms import hooks
-from wagtailstreamforms.conf import get_setting
 from wagtailstreamforms.fields import HookSelectField
 from wagtailstreamforms.forms import FormBuilder
 from wagtailstreamforms.streamfield import FormFieldsStreamField
 from wagtailstreamforms.utils.general import get_slug_from_string
 from wagtailstreamforms.utils.loading import get_advanced_settings_model
-
-from .submission import FormSubmission
+from wagtailstreamforms.models.submission import FormSubmission
 
 
 class FormQuerySet(models.QuerySet):
@@ -35,34 +32,18 @@ class AbstractForm(models.Model):
     title = models.CharField(_("Title"), max_length=255)
     slug = models.SlugField(
         _("Slug"),
-        # allow_unicode=True,
         max_length=255,
         unique=True,
-        help_text=_("Used to identify the form in template tags"),
-    )
-    template_name = models.CharField(
-        _("Template"),
-        max_length=255,
-        choices=get_setting("FORM_TEMPLATES"),
-        default=get_setting("FORM_TEMPLATES")[0][1]
     )
     fields = FormFieldsStreamField([], verbose_name=_("Fields"))
     submit_button_text = models.CharField(
-        _("Submit button text"), max_length=100, default="Submit"
+        _("Submit button text"), max_length=100, default="Envoyer"
     )
     success_message = models.CharField(
         _("Success message"),
         blank=True,
         max_length=255,
-        help_text=_(
-            "An optional success message to show when the form has been successfully submitted"
-        ),
-    )
-    error_message = models.CharField(
-        _("Error message"),
-        blank=True,
-        max_length=255,
-        help_text=_("An optional error message to show when the form has validation errors"),
+        help_text=_("An optional success message to show when the form has been successfully submitted"),
     )
     post_redirect_page = models.ForeignKey(
         "wagtailcore.Page",
@@ -79,13 +60,9 @@ class AbstractForm(models.Model):
 
     settings_panels = [
         FieldPanel("title", classname="full"),
-        FieldPanel("slug"),
-        FieldPanel("template_name"),
         FieldPanel("submit_button_text"),
-        MultiFieldPanel(
-            [FieldPanel("success_message"), FieldPanel("error_message")], _("Messages")
-        ),
-        FieldPanel("process_form_submission_hooks", classname="choice_field"),
+        FieldPanel("success_message"),
+        # FieldPanel("process_form_submission_hooks", classname="choice_field"),
         PageChooserPanel("post_redirect_page"),
     ]
 
@@ -114,11 +91,9 @@ class AbstractForm(models.Model):
             site=self.site,
             title=self.title,
             slug=uuid.uuid4(),
-            template_name=self.template_name,
             fields=self.fields,
             submit_button_text=self.submit_button_text,
             success_message=self.success_message,
-            error_message=self.error_message,
             post_redirect_page=self.post_redirect_page,
             process_form_submission_hooks=self.process_form_submission_hooks,
         )
