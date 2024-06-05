@@ -4,7 +4,9 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import BaseDetailView, SingleObjectTemplateResponseMixin
+
 from wagtail_modeladmin.helpers import PermissionHelper
+from slugify import slugify
 
 from wagtailstreamforms.models import Form
 from wagtailstreamforms.wagtail_hooks import FormURLHelper
@@ -12,7 +14,6 @@ from wagtailstreamforms.wagtail_hooks import FormURLHelper
 
 class CopyForm(forms.Form):
     title = forms.CharField(label=_("New title"))
-    slug = forms.SlugField(label=_("New slug"))
 
     def clean_slug(self):
         slug = self.cleaned_data["slug"]
@@ -50,7 +51,7 @@ class CopyFormView(SingleObjectTemplateResponseMixin, BaseDetailView):
         if form.is_valid():
             copied = self.object.copy()
             copied.title = form.cleaned_data["title"]
-            copied.slug = form.cleaned_data["slug"]
+            copied.slug = slugify(copied.title)
 
             copied.save()
 

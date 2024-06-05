@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from slugify import slugify
 
 from wagtail.admin.panels import (
     FieldPanel,
@@ -26,6 +27,8 @@ class FormQuerySet(models.QuerySet):
         """Return all forms for a specific site."""
         return self.filter(site=site)
 
+def get_default_slug():
+    return str(uuid.uuid4())
 
 class AbstractForm(models.Model):
     site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True)
@@ -34,6 +37,7 @@ class AbstractForm(models.Model):
         _("Slug"),
         max_length=255,
         unique=True,
+        default=get_default_slug,
     )
     fields = FormFieldsStreamField([], verbose_name=_("Fields"))
     submit_button_text = models.CharField(
@@ -97,7 +101,7 @@ class AbstractForm(models.Model):
             post_redirect_page=self.post_redirect_page,
             process_form_submission_hooks=self.process_form_submission_hooks,
         )
-        form_copy.save()
+        form_copy.save(auto_slug=False)
 
         # additionally copy the advanced settings if they exist
         SettingsModel = get_advanced_settings_model()
@@ -159,6 +163,9 @@ class AbstractForm(models.Model):
                 fn(self, form)
 
     def save(self, *args, **kwargs):
+        if kwargs.pop("auto_slug", True):
+            self.slug = slugify(self.title)
+
         super().save(*args, **kwargs)
         for post_save_form_hook in hooks.get_hooks("post_save_form"):
             post_save_form_hook(self)
