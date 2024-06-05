@@ -1,6 +1,7 @@
 from typing_extensions import Self
 
 from django.db import models
+from django.utils.safestring import mark_safe
 
 from wagtail.models import Page
 from wagtail.fields import RichTextField
@@ -33,16 +34,21 @@ class FormPage(Page):
     def get_context(self, request, *args, **kwargs):
         form = self.form.get_form()
         form.model = self.form
+        rendered_form = form.renderer.render(
+            template_name="streamforms/form_block.html",
+            context=form.get_context(),
+            request=request
+        )
         return {
             **super().get_context(request, *args, **kwargs),
-            "form": form.render("streamforms/form_block.html"),
+            "form": mark_safe(rendered_form),
         }
 
 
 class FormIndexPage(Page):
     description = RichTextField(
         default="Liste des formulaires",
-        help_text="Descrition de la page des formulaire, visible pas le public",
+        help_text="Descrition de la page des formulaire, visible par le public",
     )
 
     content_panels = [FieldPanel("title"), FieldPanel("description")]
