@@ -3,15 +3,14 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from slugify import slugify
+from django.contrib.auth.models import User
 
-from wagtail.admin.panels import (
-    FieldPanel,
-    ObjectList,
-    PageChooserPanel,
-    TabbedInterface,
-)
+from wagtail.admin import panels
 from wagtail.models import Site
+from wagtail.fields import RichTextField
+
+from modelcluster.fields import ParentalManyToManyField
+from slugify import slugify
 
 from wagtailstreamforms import hooks
 from wagtailstreamforms.fields import HookSelectField
@@ -60,22 +59,66 @@ class AbstractForm(models.Model):
     )
     process_form_submission_hooks = HookSelectField(verbose_name=_("Submission hooks"), blank=True)
 
+    # TODO: use a mixin for each tab?
+    # TODO: allow to use tags in emails: [form_url], [form_name], [form_results], [form_result_1]
+
+    email_orga_members = ParentalManyToManyField(
+        User,
+        blank=True,
+        verbose_name=_("Destinataires"),
+    )
+    email_orga_subject = models.CharField(
+        _("Sujet"),
+        blank=True,
+        max_length=255,
+        help_text=_("Laissez vide pour ne pas envoyer de message."),
+    )
+    email_orga_body = RichTextField(
+        _("Contenu"),
+        blank=True,
+    )
+    email_author_subject = models.CharField(
+        _("Sujet"),
+        blank=True,
+        max_length=255,
+        help_text=_("Laissez vide pour ne pas envoyer de message."),
+    )
+    email_author_body = RichTextField(
+        _("Contenu"),
+        blank=True,
+    )
+
     objects = FormQuerySet.as_manager()
 
     settings_panels = [
-        FieldPanel("title", classname="full"),
-        FieldPanel("submit_button_text"),
-        FieldPanel("success_message"),
+        panels.FieldPanel("title", classname="full"),
+        panels.FieldPanel("submit_button_text"),
+        panels.FieldPanel("success_message"),
         # FieldPanel("process_form_submission_hooks", classname="choice_field"),
-        PageChooserPanel("post_redirect_page"),
+        panels.PageChooserPanel("post_redirect_page"),
     ]
 
-    field_panels = [FieldPanel("fields")]
+    field_panels = [
+        panels.FieldPanel("fields"),
+    ]
 
-    edit_handler = TabbedInterface(
+    action_panels = [
+        panels.MultiFieldPanel([
+            panels.FieldPanel("email_orga_members"),
+            panels.FieldPanel("email_orga_subject"),
+            panels.FieldPanel("email_orga_body"),
+        ], "E-mail à destination des organisateur.ices"),
+        panels.MultiFieldPanel([
+            panels.FieldPanel("email_author_subject"),
+            panels.FieldPanel("email_author_body"),
+        ], "E-mail à destination de la personne ayant rempli le formulaire")
+    ]
+
+    edit_handler = panels.TabbedInterface(
         [
-            ObjectList(settings_panels, heading=_("General")),
-            ObjectList(field_panels, heading=_("Fields")),
+            panels.ObjectList(settings_panels, heading=_("General")),
+            panels.ObjectList(field_panels, heading=_("Fields")),
+            panels.ObjectList(action_panels, heading=_("Actions")),
         ]
     )
 
