@@ -152,3 +152,6 @@ WAGTAILSTREAMFORMS_FORM_TEMPLATES = (
     ('streamforms/form_block.html', 'Simple'),
     # ('app/custom_form_template.html', 'Custom Form Template'),
 )
+
+FORM_INDEX_PAGE_MODEL = "example:FormIndexPage"
+FORM_PAGE_MODEL = "example:FormPage"

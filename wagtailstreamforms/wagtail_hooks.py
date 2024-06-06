@@ -3,7 +3,11 @@ from django.contrib.admin.utils import quote
 from django.shortcuts import redirect
 from django.template.response import TemplateResponse
 from django.urls import include, path, reverse
+from django.db.utils import OperationalError
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+from django.db.models import Model
+
 from generic_chooser.views import ModelChooserViewSet
 from generic_chooser.widgets import AdminChooser
 from wagtail import hooks
@@ -23,10 +27,52 @@ from wagtailstreamforms.utils.requests import get_form_instance_from_request
 SettingsModel = get_advanced_settings_model()
 
 
+def get_model(setting_name) -> type[Model] | None:
+    try:
+        app_label, model_name = getattr(settings, setting_name).split(":")
+    except AttributeError:
+        print(f"warning: { setting_name } setting not defined")
+        return None
+    except ValueError:
+        print(f"warning: { setting_name } setting misconfigured (must be app_label:model_name)")
+        return None
+
+    from django.apps import apps
+
+    return apps.get_model(app_label=app_label, model_name=model_name)
+
+
+def get_form_index_page() -> Model | None:
+    FormIndexPage = get_model('FORM_INDEX_PAGE_MODEL')
+    if FormIndexPage:
+        try:
+            return FormIndexPage.objects.first()
+        except OperationalError:
+            pass
+    return None
+
+
+def get_form_page(form_slug: str) -> Model | None:
+    FormPage = get_model('FORM_PAGE_MODEL')
+    if FormPage:
+        try:
+            return FormPage.objects.get(slug=form_slug)
+        except OperationalError:
+            pass
+    return None
+
+
 class FormURLHelper(AdminURLHelper):
     def get_action_url(self, action, *args, **kwargs):
         if action in ["advanced", "copy", "submissions"]:
             return reverse("wagtailstreamforms:streamforms_%s" % action, args=args, kwargs=kwargs)
+
+        if action == "view":
+            form_page = get_form_page(Form.objects.get(pk=args[0]).slug)
+            if not form_page:
+                return super().get_action_url("index")
+            
+            return form_page.url
 
         return super().get_action_url(action, *args, **kwargs)
 
@@ -88,6 +134,18 @@ class FormButtonHelper(ButtonHelper):
             )
         )
 
+        if hasattr(settings, 'FORM_PAGE_MODEL'):
+            buttons.append(
+                self.button(
+                    pk,
+                    "view",
+                    _("View"),
+                    _("Go to this form"),
+                    classnames_add,
+                    classnames_exclude,
+                )
+            )
+
         return buttons
 
 
@@ -125,10 +183,12 @@ class EditFormView(InstanceSpecificViewHookMixin, EditView):
 class DeleteFormView(InstanceSpecificViewHookMixin, DeleteView):
     pass
 
+
 @modeladmin_register
 # @register_snippet
 # class FormSnippetViewSet(SnippetViewSet):
 class FormModelAdmin(ModelAdmin):
+    form_index_page = get_form_index_page()
     model = Form
     # add_to_admin_menu = True
     list_display = ("title", "slug", "latest_submission", "saved_submissions")

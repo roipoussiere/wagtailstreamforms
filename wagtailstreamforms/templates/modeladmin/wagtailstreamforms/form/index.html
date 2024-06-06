@@ -1,0 +1,15 @@
+{% extends "modeladmin/index.html" %}
+{% load wagtailadmin_tags %}
+
+{% block header_extra %}
+    {% if model_admin.form_index_page %}
+    <a
+            class="button bicolor button--icon"
+            title="Go to the page listing all published forms"
+            href="{{ model_admin.form_index_page.url }}">
+        <span class="icon-wrapper">{% icon name="view" %}</span>
+        View forms
+    </a>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
