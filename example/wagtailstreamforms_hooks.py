@@ -10,8 +10,7 @@ from .models import FormPage
 @register('process_form_submission')
 def email_submission(instance, form):
     """ Send an email with the submission. """
-    if not hasattr(instance, 'advanced_settings'):
-        return
+    return # TODO, TBD: how to get e-mail adresses?
 
     addresses = [instance.advanced_settings.to_address]
     content = ['Please see below submission\n', ]

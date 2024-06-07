@@ -1,3 +1,4 @@
+import uuid
 from typing_extensions import Self
 
 from django.db import models
@@ -32,7 +33,9 @@ class FormPage(Page):
         return form_page
 
     def get_context(self, request, *args, **kwargs):
-        form = self.form.get_form()
+        form: Form = self.form.get_form()
+        form.fields['form_id'].initial = self.form.pk
+        form.fields['form_reference'].initial = uuid.uuid4()
         form.model = self.form
         rendered_form = form.renderer.render(
             template_name="streamforms/form_block.html",

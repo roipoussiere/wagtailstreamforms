@@ -13,7 +13,6 @@ from modelcluster.fields import ParentalManyToManyField
 from slugify import slugify
 
 from wagtailstreamforms import hooks
-from wagtailstreamforms.fields import HookSelectField
 from wagtailstreamforms.forms import FormBuilder
 from wagtailstreamforms.streamfield import FormFieldsStreamField
 from wagtailstreamforms.utils.general import get_slug_from_string
@@ -28,6 +27,7 @@ class FormQuerySet(models.QuerySet):
 
 def get_default_slug():
     return str(uuid.uuid4())
+
 
 class AbstractForm(models.Model):
     site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True)
@@ -57,7 +57,6 @@ class AbstractForm(models.Model):
         related_name="+",
         help_text=_("The page to redirect to after a successful submission"),
     )
-    process_form_submission_hooks = HookSelectField(verbose_name=_("Submission hooks"), blank=True)
 
     # TODO: use a mixin for each tab?
     # TODO: allow to use tags in emails: [form_url], [form_name], [form_results], [form_result_1]
@@ -94,7 +93,6 @@ class AbstractForm(models.Model):
         panels.FieldPanel("title", classname="full"),
         panels.FieldPanel("submit_button_text"),
         panels.FieldPanel("success_message"),
-        # FieldPanel("process_form_submission_hooks", classname="choice_field"),
         panels.PageChooserPanel("post_redirect_page"),
     ]
 
@@ -142,7 +140,6 @@ class AbstractForm(models.Model):
             submit_button_text=self.submit_button_text,
             success_message=self.success_message,
             post_redirect_page=self.post_redirect_page,
-            process_form_submission_hooks=self.process_form_submission_hooks,
         )
         form_copy.save(auto_slug=False)
 
@@ -202,8 +199,7 @@ class AbstractForm(models.Model):
         """Runs each hook if selected in the form."""
 
         for fn in hooks.get_hooks("process_form_submission"):
-            if fn.__name__ in self.process_form_submission_hooks:
-                fn(self, form)
+            fn(self, form)
 
     def save(self, *args, **kwargs):
         if kwargs.pop("auto_slug", True):

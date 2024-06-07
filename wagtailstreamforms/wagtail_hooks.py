@@ -283,13 +283,10 @@ def process_form(page, request, *args, **kwargs):
                 )
 
                 # create error messages
-                if form_def.error_message:
-                    messages.error(request, form_def.error_message, fail_silently=True)
-                else:
-                    for field_name, field_errors in form._errors.items():
-                        for field_error in field_errors:
-                            error_message = f"{ field_name }: { field_error }"
-                            messages.error(request, error_message, fail_silently=True)
+                for field_name, field_errors in form._errors.items():
+                    for field_error in field_errors:
+                        error_message = f"{ field_name }: { field_error }"
+                        messages.error(request, error_message, fail_silently=True)
 
                 return TemplateResponse(
                     request, page.get_template(request, *args, **kwargs), context
