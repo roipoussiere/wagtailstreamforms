@@ -7,6 +7,8 @@ from django.db.utils import OperationalError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.db.models import Model
+from django.utils.html import format_html
+from django.templatetags.static import static
 
 from generic_chooser.views import ModelChooserViewSet
 from generic_chooser.widgets import AdminChooser
@@ -314,3 +316,8 @@ def register_wagtailstreamforms_chooser_viewset():
     return WagtailStreamFormsChooserViewSet(
         "wagtailstreamforms_chooser", url_prefix="wagtailstreamforms-chooser"
     )
+
+
+@hooks.register('insert_global_admin_css')
+def global_admin_css():
+    return format_html('<link rel="stylesheet" href="{}">', static('blocks.css'))

@@ -1,10 +1,11 @@
 from os import environ
-from os.path import dirname, abspath, join
+from pathlib import Path
 
 from django.urls import reverse_lazy
 
-SITE_DIR = dirname(abspath(__file__))
+SITE_DIR = Path(__file__).parent
 
+WAGTAILSTREAMFORMS_DIR = SITE_DIR.parent / "wagtailstreamforms"
 
 # Security
 
@@ -70,7 +71,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            join(SITE_DIR, 'templates'),
+            SITE_DIR / 'templates',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -93,7 +94,7 @@ WSGI_APPLICATION = 'example.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": SITE_DIR + "/default.db.sqlite3",
+        "NAME": SITE_DIR / "default.db.sqlite3",
     }
 }
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -131,11 +132,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 
 STATICFILES_DIRS = [
-    join(SITE_DIR, "static"),
+    SITE_DIR / "static",
+    WAGTAILSTREAMFORMS_DIR / "static",
 ]
 STATIC_URL = "/static/"
 
-MEDIA_ROOT = join(SITE_DIR, "media")
+MEDIA_ROOT = SITE_DIR / "media"
 MEDIA_URL = "/media/"
 
 

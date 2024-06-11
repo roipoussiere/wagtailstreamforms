@@ -1,0 +1,11 @@
+.condition-block {
+    display: flex;
+}
+
+.condition-block .w-field__label, .condition-block .c-sf-help {
+    display: none;
+}
+
+.w-field .condition-field {
+    margin: 5px;
+}

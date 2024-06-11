@@ -93,6 +93,13 @@ class BaseField:
             )
 
     @classmethod
+    def get_formfield_identifier(cls, block_value):
+        """
+        Return a value to use as the 'identifier' for the Django form field.
+        """
+        return block_value.get("identifier")
+
+    @classmethod
     def get_formfield_help_text(cls, block_value):
         """
         Return a value to use as the 'help_text' for the Django form field.
@@ -142,6 +149,7 @@ class BaseField:
 
         return {
             "label": self.get_formfield_label(block_value),
+            "identifier": self.get_formfield_identifier(block_value), 
             "help_text": self.get_formfield_help_text(block_value),
             "required": self.get_formfield_required(block_value),
             "initial": self.get_formfield_initial(block_value),
@@ -156,14 +164,47 @@ class BaseField:
         """
         return blocks.StructBlock(
             [
-                ("label", blocks.CharBlock()),
-                ("help_text", blocks.CharBlock(required=False)),
-                ("required", blocks.BooleanBlock(required=False)),
-                ("default_value", blocks.CharBlock(required=False)),
+                ("label", blocks.CharBlock(help_text="Texte permetant de décrire le champ.")),
+                ("help_text", blocks.CharBlock(required=False, help_text="Message indicatif affiché en dessous du label (comme celui-ci).")),
+                ("required", blocks.BooleanBlock(required=False, help_text="Cocher pour rendre ce champ obligatoire.")),
+                ("default_value", blocks.CharBlock(required=False, help_text="Valeur à insérer dans le champ.")),
+                ("identifier", blocks.CharBlock(required=False, help_text="Un identifiant unique utilisé pour construire des formulaires conditionnels.")),
+                ("visibility_condition", ConditionBlock()),
             ],
             icon=self.icon,
             label=self.label,
         )
+
+
+class ConditionBlock(blocks.StructBlock):
+    condition_field_identifier = blocks.CharBlock(
+        required=False,
+        classname="condition-field",
+        help_text='identifiant du champ conditionnel',
+    )
+    condition_operator = blocks.ChoiceBlock(
+        required=True,
+        classname="condition-field",
+        help_text='opérateur de comparaison',
+        choices=[
+            ('lt', '<'),
+            ('lte', '≤'),
+            ('eq', '='),
+            ('gte', '≥'),
+            ('gt', '>'),
+            ('in', 'in')
+        ],
+        default='eq',
+    )
+    condition_value = blocks.CharBlock(
+        required=False,
+        classname="condition-field",
+        help_text="valeur à comparer",
+    )
+
+    class Meta:
+        form_classname = "condition-block struct-block"
+        help_text = "Condition pour afficher le champ."
 
 
 class HookMultiSelectFormField(forms.MultipleChoiceField):
